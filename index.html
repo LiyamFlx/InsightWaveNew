@@ -1,0 +1,263 @@
+x<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>InsightWave - Engagement Analysis</title>
+  <style>
+    /* Reset Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: #121212;
+      color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      overflow: hidden;
+      flex-direction: column;
+    }
+
+    /* Container */
+    .container {
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+      padding: 20px;
+      background-color: #1e1e1e;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Start Screen */
+    #start-screen {
+      display: block;
+    }
+
+    /* Hidden screens */
+    #upload-screen, #analysis-screen, #results-screen {
+      display: none;
+    }
+
+    /* Header */
+    h1 {
+      font-size: 2em;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    p {
+      font-size: 1em;
+      color: #a682ff;
+      margin-bottom: 20px;
+    }
+
+    /* Start Button */
+    .start-button, .next-button, .download-button {
+      background-color: #a682ff;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 1em;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .start-button:hover, .next-button:hover, .download-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px #a682ff;
+    }
+
+    /* Drag-and-Drop Area */
+    .upload-area {
+      border: 2px dashed #a682ff;
+      padding: 30px;
+      border-radius: 10px;
+      color: #a682ff;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .upload-area.dragging {
+      background-color: rgba(166, 130, 255, 0.1);
+    }
+
+    /* Progress Bar */
+    #progress-bar {
+      width: 100%;
+      height: 20px;
+      background-color: #333;
+      border-radius: 5px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+
+    #progress {
+      height: 100%;
+      width: 0;
+      background-color: #a682ff;
+      transition: width 0.3s;
+    }
+
+    /* Chart Canvas */
+    canvas {
+      margin-top: 20px;
+      max-width: 100%;
+    }
+
+    /* Media Queries */
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 1.5em;
+      }
+
+      p {
+        font-size: 0.9em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Start Screen -->
+  <div class="container" id="start-screen">
+    <h1>Welcome to InsightWave</h1>
+    <p>Analyze your audio to uncover insights into engagement and sentiment.</p>
+    <button class="start-button" onclick="showScreen('upload-screen')">Start Analysis</button>
+  </div>
+
+  <!-- Upload File Screen -->
+  <div class="container" id="upload-screen">
+    <h2>Upload Audio File</h2>
+    <div class="upload-area" id="upload-area">
+      Drag and drop your file here or click to select
+      <input type="file" id="audio-file" accept=".mp3, .mp4, .wav" style="display: none;">
+    </div>
+    <button class="next-button" onclick="startAnalysis()">Next</button>
+  </div>
+
+  <!-- Real-Time Analysis Screen -->
+  <div class="container" id="analysis-screen">
+    <h2>Real-Time Analysis</h2>
+    <div id="progress-bar">
+      <div id="progress"></div>
+    </div>
+    <canvas id="engagementChart"></canvas>
+    <button class="next-button" onclick="showScreen('results-screen')">View Results</button>
+  </div>
+
+  <!-- Results Screen -->
+  <div class="container" id="results-screen">
+    <h2>Analysis Results</h2>
+    <p>Average Engagement Score: <span id="engagement-score">-</span></p>
+    <button class="download-button" onclick="downloadReport()">Download Report</button>
+    <button class="start-button" onclick="showScreen('start-screen')">Start New Analysis</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Show specific screen
+    function showScreen(screenId) {
+      document.querySelectorAll('.container').forEach(screen => screen.style.display = 'none');
+      document.getElementById(screenId).style.display = 'block';
+    }
+
+    // Drag-and-drop file upload
+    const uploadArea = document.getElementById("upload-area");
+    const audioInput = document.getElementById("audio-file");
+
+    uploadArea.addEventListener("click", () => audioInput.click());
+
+    uploadArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      uploadArea.classList.add("dragging");
+    });
+
+    uploadArea.addEventListener("dragleave", () => uploadArea.classList.remove("dragging"));
+
+    uploadArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      uploadArea.classList.remove("dragging");
+      audioInput.files = e.dataTransfer.files;
+    });
+
+    // Start Analysis
+    function startAnalysis() {
+      showScreen("analysis-screen");
+      const progressBar = document.getElementById("progress");
+      let progress = 0;
+
+      const interval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(interval);
+          document.getElementById("engagement-score").innerText = "8.5"; // Placeholder score
+        } else {
+          progress += 10;
+          progressBar.style.width = progress + "%";
+        }
+      }, 500);
+
+      createEngagementChart();
+    }
+
+    // Placeholder for Chart.js engagement chart
+    function createEngagementChart() {
+      const ctx = document.getElementById("engagementChart").getContext("2d");
+      new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [1, 2, 3, 4, 5],
+          datasets: [{
+            label: "Engagement Score",
+            data: [8, 7, 9, 6, 10],
+            backgroundColor: "rgba(166, 130, 255, 0.2)",
+            borderColor: "#a682ff",
+            borderWidth: 2,
+            pointBackgroundColor: ["#a0ffa0", "#ff7070", "#a682ff", "#ff7070", "#a0ffa0"],
+            pointBorderColor: "#fff"
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 10
+            }
+          },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  let sentiment = context.raw > 7 ? "Positive" : (context.raw < 5 ? "Negative" : "Neutral");
+                  return `Score: ${context.raw} (${sentiment})`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Download report as CSV
+    function downloadReport() {
+      const csvContent = "data:text/csv;charset=utf-8,Time,Engagement Score\n1,8\n2,7\n3,9\n4,6\n5,10\n";
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "engagement_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
+
