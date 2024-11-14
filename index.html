@@ -20,7 +20,7 @@
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      height: 100vh;
+      min-height: 100vh;
       text-align: center;
       overflow: hidden;
     }
@@ -28,44 +28,51 @@
     /* Main Container */
     .container {
       width: 90%;
-      max-width: 900px;
+      max-width: 600px;
       padding: 20px;
       background-color: #1e1e1e;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
       margin-top: 20px;
       transition: transform 0.5s ease;
+      display: none;
     }
 
-    .container h1 {
-      font-size: 2.5em;
+    .active {
+      display: block;
+    }
+
+    h1 {
+      font-size: 2em;
       color: #fff;
+      margin-bottom: 15px;
     }
 
-    .container p {
+    p {
       color: #a682ff;
       font-size: 1.2em;
+      margin-bottom: 20px;
     }
 
     /* Start Button */
-    .start-button {
+    .start-button, .button {
       background-color: #a682ff;
       color: white;
       padding: 15px 30px;
-      font-size: 1.3em;
+      font-size: 1.1em;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      transition: 0.3s ease;
+      transition: transform 0.3s ease, background-color 0.3s ease;
       margin-top: 20px;
     }
 
-    .start-button:hover {
+    .start-button:hover, .button:hover {
       background-color: #7f5fbb;
       transform: scale(1.05);
     }
 
-    /* Animation for waveform */
+    /* Waveform Animation */
     .waveform {
       width: 100%;
       height: 100px;
@@ -76,17 +83,30 @@
     }
 
     @keyframes pulse {
-      0%, 100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-      50% {
-        transform: scale(1.1);
-        opacity: 0.7;
-      }
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.7; }
     }
 
-    /* Tooltip for hover elements */
+    /* Upload File Styling */
+    .file-upload-container {
+      border: 2px dashed #a682ff;
+      padding: 40px;
+      border-radius: 8px;
+      text-align: center;
+      color: #a682ff;
+      margin-bottom: 20px;
+    }
+
+    .file-upload-container.dragging {
+      border: 2px solid #7f5fbb;
+    }
+
+    .info-icon {
+      font-size: 1.2em;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+
     .tooltip {
       display: none;
       position: absolute;
@@ -95,124 +115,142 @@
       padding: 8px;
       font-size: 0.9em;
       border-radius: 5px;
-      text-align: center;
+      text-align: left;
+      top: -40px;
+      right: 10px;
+      white-space: nowrap;
     }
 
     .info-icon:hover + .tooltip {
       display: block;
     }
 
+    /* Progress Bar */
+    .progress-bar {
+      width: 100%;
+      height: 15px;
+      background-color: #333;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: #a682ff;
+      width: 0;
+    }
+
+    /* Graph Container */
+    .graph-container {
+      width: 100%;
+      height: 200px;
+      background-color: #2c2c2c;
+      border-radius: 8px;
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #a682ff;
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-        width: 100%;
-      }
-
-      .start-button {
-        width: 100%;
-        padding: 20px;
-        font-size: 1.5em;
-      }
+      h1 { font-size: 1.8em; }
+      .start-button, .button { width: 100%; padding: 20px; font-size: 1.3em; }
     }
-
-    /* Buttons */
-    .button {
-      background-color: #a682ff;
-      color: #fff;
-      font-size: 1.1em;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-top: 15px;
-    }
-
-    .button:hover {
-      background-color: #7f5fbb;
-    }
-
   </style>
 </head>
 <body>
 
   <!-- Start Screen -->
-  <div class="container" id="start-screen">
+  <div class="container active" id="start-screen">
     <h1>Welcome to InsightWave</h1>
     <p>Analyze your audio to uncover insights into engagement and sentiment</p>
-    
-    <button class="start-button" id="start-analysis-btn">
+    <button class="start-button" onclick="showScreen('upload-file-screen')">
       Start Analysis
-      <span class="info-icon">🛈</span>
-      <div class="tooltip">Get real-time feedback on engagement, sentiment, and audience response to your audio.</div>
+      <span class="info-icon">ℹ️</span>
+      <div class="tooltip">Get feedback on engagement, sentiment, and audience response to your audio.</div>
     </button>
-
     <div class="waveform"></div>
   </div>
 
   <!-- Upload File Screen -->
-  <div class="container" id="upload-file-screen" style="display:none;">
+  <div class="container" id="upload-file-screen">
     <h1>Upload Audio File</h1>
-    <label for="file-upload" class="upload-box">
-      <input type="file" id="file-upload" accept=".mp3,.mp4,.wav" />
-      Drag and drop or click to select your audio file
-    </label>
-    <button class="button" id="next-btn" style="opacity: 0.5;" disabled>Next</button>
+    <div class="file-upload-container" ondrop="handleDrop(event)" ondragover="event.preventDefault()">
+      <input type="file" id="file-upload" accept=".mp3,.mp4,.wav" onchange="enableNextButton()">
+      <label for="file-upload">Drag and drop your audio file here or click to browse</label>
+    </div>
+    <button class="button" id="next-btn" onclick="showScreen('analysis-screen')" disabled>Next</button>
   </div>
 
   <!-- Real-Time Analysis Screen -->
-  <div class="container" id="analysis-screen" style="display:none;">
+  <div class="container" id="analysis-screen">
     <h1>Real-Time Analysis</h1>
     <p>Analyzing engagement and sentiment in real-time...</p>
     <div class="progress-bar">
-      <div class="progress" id="sentiment-progress">Analyzing... 0%</div>
+      <div class="progress" id="analysis-progress"></div>
     </div>
-    <div id="real-time-scores">Engagement Score: 0 | Sentiment Score: 0</div>
-    <button class="button" id="pause-btn">Pause</button>
-    <button class="button" id="highlight-btn">Highlight Sections</button>
+    <div class="graph-container">
+      <p>Data visualization of engagement and sentiment</p>
+    </div>
+    <button class="button" onclick="showScreen('results-screen')">View Results</button>
   </div>
 
   <!-- Results Screen -->
-  <div class="container" id="results-screen" style="display:none;">
+  <div class="container" id="results-screen">
     <h1>Analysis Results</h1>
+    <div class="graph-container">
+      <p>Engagement and Sentiment Graph</p>
+    </div>
     <p><strong>Overall Engagement Score:</strong> 8.5/10</p>
     <button class="button">Download Report</button>
-    <button class="button">Replay Analysis</button>
+    <button class="button" onclick="showScreen('start-screen')">Analyze Another</button>
   </div>
 
   <script>
-    // Navigation and file upload handling
-    document.getElementById("start-analysis-btn").addEventListener("click", function() {
-      document.getElementById("start-screen").style.display = "none";
-      document.getElementById("upload-file-screen").style.display = "block";
-    });
+    // Navigation between screens
+    function showScreen(screenId) {
+      document.querySelectorAll('.container').forEach(container => {
+        container.classList.remove('active');
+      });
+      document.getElementById(screenId).classList.add('active');
+    }
 
-    document.getElementById("file-upload").addEventListener("change", function(event) {
-      if (event.target.files.length > 0) {
-        document.getElementById("next-btn").disabled = false;
-        document.getElementById("next-btn").style.opacity = 1;
+    // Enable "Next" button after file upload
+    function enableNextButton() {
+      document.getElementById('next-btn').disabled = false;
+    }
+
+    // Simulate Analysis Progress
+    let progressInterval;
+    function simulateProgress() {
+      let progress = document.getElementById("analysis-progress");
+      let width = 0;
+      clearInterval(progressInterval);
+      progressInterval = setInterval(() => {
+        if (width >= 100) {
+          clearInterval(progressInterval);
+        } else {
+          width++;
+          progress.style.width = width + "%";
+        }
+      }, 50);
+    }
+
+    // Start Progress on Analysis Screen Load
+    document.getElementById('analysis-screen').addEventListener('transitionstart', simulateProgress);
+
+    // Drag and drop handler
+    function handleDrop(event) {
+      event.preventDefault();
+      const files = event.dataTransfer.files;
+      if (files.length > 0) {
+        document.getElementById('file-upload').files = files;
+        enableNextButton();
       }
-    });
-
-    document.getElementById("next-btn").addEventListener("click", function() {
-      document.getElementById("upload-file-screen").style.display = "none";
-      document.getElementById("analysis-screen").style.display = "block";
-    });
-
-    // Simulating analysis progress
-    let analysisProgress = 0;
-    const progressInterval = setInterval(() => {
-      if (analysisProgress < 100) {
-        analysisProgress++;
-        document.getElementById("sentiment-progress").style.width = analysisProgress + "%";
-        document.getElementById("sentiment-progress").innerText = `Analyzing... ${analysisProgress}%`;
-      } else {
-        clearInterval(progressInterval);
-        document.getElementById("analysis-screen").style.display = "none";
-        document.getElementById("results-screen").style.display = "block";
-      }
-    }, 100);
+    }
   </script>
 </body>
 </html>
