@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InsightWave - Start Analysis</title>
+  <title>InsightWave - Engagement Analysis</title>
   <style>
-    /* Reset Styles */
+    /* General Reset */
     * {
       margin: 0;
       padding: 0;
@@ -19,134 +19,308 @@
       display: flex;
       justify-content: center;
       align-items: center;
+      flex-direction: column;
       height: 100vh;
       text-align: center;
       overflow: hidden;
-      flex-direction: column;
     }
 
-    /* Container */
+    /* Main Container */
     .container {
       width: 90%;
-      max-width: 600px;
-      text-align: center;
+      max-width: 900px;
       padding: 20px;
       background-color: #1e1e1e;
       border-radius: 10px;
       box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-      animation: fadeIn 0.5s ease;
+      margin-top: 20px;
+      transition: transform 0.5s ease;
     }
 
-    /* Fade-in Animation */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    /* Waveform Background Animation */
-    .waveform-background {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1;
-      background: linear-gradient(90deg, rgba(166, 130, 255, 0.1), transparent);
-      animation: pulse 2s infinite alternate;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 0.6; }
-      100% { transform: scale(1.05); opacity: 1; }
-    }
-
-    /* Header */
-    h1 {
-      font-size: 2em;
+    .container h1 {
+      font-size: 2.5em;
       color: #fff;
-      margin-bottom: 10px;
     }
 
-    /* Intro Text */
-    .tagline {
+    .container p {
       color: #a682ff;
-      font-size: 1em;
-      margin-bottom: 20px;
+      font-size: 1.2em;
     }
 
     /* Start Button */
     .start-button {
       background-color: #a682ff;
-      color: #fff;
-      font-size: 1.2em;
+      color: white;
       padding: 15px 30px;
+      font-size: 1.3em;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      position: relative;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      transition: 0.3s ease;
+      margin-top: 20px;
     }
 
     .start-button:hover {
+      background-color: #7f5fbb;
       transform: scale(1.05);
-      box-shadow: 0 0 10px #a682ff;
     }
 
-    /* Tooltip Icon */
-    .info-icon {
-      margin-left: 8px;
-      font-size: 0.8em;
-      color: #a682ff;
-      cursor: pointer;
-      position: relative;
+    /* Animation for waveform */
+    .waveform {
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(90deg, rgba(166, 130, 255, 0.5), transparent);
+      animation: pulse 2s infinite;
+      border-radius: 5px;
+      margin-top: 20px;
     }
 
-    /* Tooltip */
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+      }
+    }
+
+    /* Progress bar */
+    .progress-bar {
+      width: 100%;
+      height: 15px;
+      background-color: #333;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: #a682ff;
+      width: 0;
+      animation: progressBar 3s linear infinite;
+    }
+
+    @keyframes progressBar {
+      0% {
+        width: 0;
+      }
+      50% {
+        width: 50%;
+      }
+      100% {
+        width: 100%;
+      }
+    }
+
+    /* Tooltip for hover elements */
     .tooltip {
       display: none;
       position: absolute;
-      bottom: 110%;
-      right: -10px;
       background-color: #333;
       color: #fff;
       padding: 8px;
       font-size: 0.9em;
       border-radius: 5px;
-      width: 200px;
-      text-align: left;
-      z-index: 10;
+      text-align: center;
     }
 
-    .info-icon:hover .tooltip {
+    .info-icon:hover + .tooltip {
       display: block;
     }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+        width: 100%;
+      }
+
+      .start-button {
+        width: 100%;
+        padding: 20px;
+        font-size: 1.5em;
+      }
+    }
+
+    /* Graphs */
+    .graph-container {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    /* Buttons */
+    .button {
+      background-color: #a682ff;
+      color: #fff;
+      font-size: 1.1em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 15px;
+    }
+
+    .button:hover {
+      background-color: #7f5fbb;
+    }
+
   </style>
 </head>
 <body>
-  <!-- Waveform Background Animation -->
-  <div class="waveform-background"></div>
 
   <!-- Start Screen -->
   <div class="container" id="start-screen">
     <h1>Welcome to InsightWave</h1>
-    <p class="tagline">Analyze your audio to uncover insights into engagement and sentiment</p>
-    <button class="start-button" onclick="showScreen('upload-screen')">
+    <p>Analyze your audio to uncover insights into engagement and sentiment</p>
+    
+    <div class="start-button">
       Start Analysis
-      <span class="info-icon">🛈
-        <span class="tooltip">Get real-time feedback on engagement, sentiment, and audience response to your audio.</span>
-      </span>
-    </button>
+      <span class="info-icon">🛈</span>
+      <div class="tooltip">Get real-time feedback on engagement, sentiment, and audience response to your audio.</div>
+    </div>
+
+    <div class="waveform"></div>
+  </div>
+
+  <!-- Upload File Screen -->
+  <div class="container" id="upload-file-screen" style="display:none;">
+    <h1>Upload Audio File</h1>
+    <div class="progress-bar">
+      <div class="progress" id="upload-progress"></div>
+    </div>
+    <div class="file-upload-container">
+      <label for="file-upload" class="upload-box">
+        <input type="file" id="file-upload" accept=".mp3,.mp4,.wav" />
+        Drag and drop or click to select your audio file
+      </label>
+      <button class="button" id="next-btn" style="opacity: 0.5;" disabled>Next</button>
+    </div>
+  </div>
+
+  <!-- Real-Time Analysis Screen -->
+  <div class="container" id="analysis-screen" style="display:none;">
+    <h1>Real-Time Analysis</h1>
+    <p>Analyzing engagement and sentiment in real-time...</p>
+
+    <!-- Sentiment Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress" id="sentiment-progress" style="width: 50%;">Analyzing... 50%</div>
+    </div>
+
+    <div class="graph-container" id="graph-container">
+      <!-- Placeholder for dynamic graph visualization -->
+      <p>Real-time data visualization will appear here.</p>
+    </div>
+
+    <div class="real-time-scores" id="real-time-scores">
+      Engagement Score: 7.5 | Sentiment Score: 6.0
+    </div>
+
+    <button class="button" id="pause-btn">Pause</button>
+    <button class="button" id="highlight-btn">Highlight Sections</button>
+  </div>
+
+  <!-- Results Screen -->
+  <div class="container" id="results-screen" style="display:none;">
+    <h1>Analysis Results</h1>
+
+    <div class="key-insights">
+      <p><strong>Overall Engagement Score:</strong> 8.5/10</p>
+      <p><strong>Peak Engagement Times:</strong> Segment 1, Segment 3</p>
+      <p><strong>Improvement Tips:</strong> Increase pitch variation during quieter moments</p>
+    </div>
+
+    <div class="graph-container">
+      <p>Sentiment Analysis Chart (Visualization Placeholder)</p>
+    </div>
+
+    <button class="button">Download Report (PDF/CSV)</button>
+    <button class="button">Replay Analysis</button>
   </div>
 
   <script>
-    // Show specific screen with a fade transition effect
-    function showScreen(screenId) {
-      document.getElementById('start-screen').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById(screenId).style.display = 'block';
-        document.getElementById(screenId).style.opacity = '1';
-      }, 500);
-    }
+    // Real-time Analysis Simulation
+    let progress = document.getElementById("upload-progress");
+    let sentimentProgress = document.getElementById("sentiment-progress");
+    let realTimeScores = document.getElementById("real-time-scores");
+
+    // Example of file upload process simulation
+    let uploadProgress = 0;
+    setInterval(() => {
+      if (uploadProgress < 100) {
+        uploadProgress += 2;
+        progress.style.width = uploadProgress + "%";
+        if (uploadProgress === 100) {
+          document.getElementById("next-btn").disabled = false;
+          document.getElementById("next-btn").style.opacity = 1;
+        }
+      }
+    }, 200);
+
+    // Real-time sentiment progress
+    let sentimentProgressValue = 50;
+    setInterval(() => {
+      if (sentimentProgressValue < 100) {
+        sentimentProgressValue += 2;
+        sentimentProgress.style.width = sentimentProgressValue + "%";
+        sentimentProgress.innerText = `Analyzing... ${sentimentProgressValue}%`;
+        realTimeScores.innerText = `Engagement Score: ${(7.5 + Math.random() * 0.5).toFixed(1)} | Sentiment Score: ${(6.0 + Math.random() * 0.5).toFixed(1)}`;
+      }
+    }, 1000);
+
+    // File Upload Handling
+    document.getElementById("file-upload").addEventListener("change", function(event) {
+      if (event.target.files.length > 0) {
+        document.getElementById("next-btn").disabled = false;
+        document.get
+      if (event.target.files.length > 0) {
+        document.getElementById("next-btn").disabled = false;
+        document.getElementById("next-btn").style.opacity = 1;
+      }
+    });
+
+    // Screen Navigation Logic
+    document.querySelector(".start-button").addEventListener("click", () => {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("upload-file-screen").style.display = "block";
+    });
+
+    document.getElementById("next-btn").addEventListener("click", () => {
+      document.getElementById("upload-file-screen").style.display = "none";
+      document.getElementById("analysis-screen").style.display = "block";
+    });
+
+    // Dummy Real-Time Analysis Logic
+    let analysisProgress = 0;
+    const analysisInterval = setInterval(() => {
+      if (analysisProgress < 100) {
+        analysisProgress += 1;
+        document.getElementById("sentiment-progress").style.width = analysisProgress + "%";
+        document.getElementById("sentiment-progress").innerText = `Analyzing... ${analysisProgress}%`;
+        document.getElementById("real-time-scores").innerText = `Engagement Score: ${(7.5 + Math.random() * 0.5).toFixed(1)} | Sentiment Score: ${(6.0 + Math.random() * 0.5).toFixed(1)}`;
+      } else {
+        clearInterval(analysisInterval);
+        document.getElementById("analysis-screen").style.display = "none";
+        document.getElementById("results-screen").style.display = "block";
+      }
+    }, 100);
+
+    // Pause and Highlight Buttons (Dummy functionality)
+    document.getElementById("pause-btn").addEventListener("click", () => {
+      alert("Paused analysis (dummy functionality).");
+    });
+
+    document.getElementById("highlight-btn").addEventListener("click", () => {
+      alert("Highlighting sections (dummy functionality).");
+    });
   </script>
 </body>
 </html>
