@@ -86,35 +86,6 @@
       }
     }
 
-    /* Progress bar */
-    .progress-bar {
-      width: 100%;
-      height: 15px;
-      background-color: #333;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    .progress {
-      height: 100%;
-      background-color: #a682ff;
-      width: 0;
-      animation: progressBar 3s linear infinite;
-    }
-
-    @keyframes progressBar {
-      0% {
-        width: 0;
-      }
-      50% {
-        width: 50%;
-      }
-      100% {
-        width: 100%;
-      }
-    }
-
     /* Tooltip for hover elements */
     .tooltip {
       display: none;
@@ -145,16 +116,6 @@
       }
     }
 
-    /* Graphs */
-    .graph-container {
-      position: relative;
-      width: 100%;
-      height: 300px;
-      background-color: #1e1e1e;
-      border-radius: 8px;
-      margin-top: 20px;
-    }
-
     /* Buttons */
     .button {
       background-color: #a682ff;
@@ -181,11 +142,11 @@
     <h1>Welcome to InsightWave</h1>
     <p>Analyze your audio to uncover insights into engagement and sentiment</p>
     
-    <div class="start-button">
+    <button class="start-button" id="start-analysis-btn">
       Start Analysis
       <span class="info-icon">🛈</span>
       <div class="tooltip">Get real-time feedback on engagement, sentiment, and audience response to your audio.</div>
-    </div>
+    </button>
 
     <div class="waveform"></div>
   </div>
@@ -193,37 +154,21 @@
   <!-- Upload File Screen -->
   <div class="container" id="upload-file-screen" style="display:none;">
     <h1>Upload Audio File</h1>
-    <div class="progress-bar">
-      <div class="progress" id="upload-progress"></div>
-    </div>
-    <div class="file-upload-container">
-      <label for="file-upload" class="upload-box">
-        <input type="file" id="file-upload" accept=".mp3,.mp4,.wav" />
-        Drag and drop or click to select your audio file
-      </label>
-      <button class="button" id="next-btn" style="opacity: 0.5;" disabled>Next</button>
-    </div>
+    <label for="file-upload" class="upload-box">
+      <input type="file" id="file-upload" accept=".mp3,.mp4,.wav" />
+      Drag and drop or click to select your audio file
+    </label>
+    <button class="button" id="next-btn" style="opacity: 0.5;" disabled>Next</button>
   </div>
 
   <!-- Real-Time Analysis Screen -->
   <div class="container" id="analysis-screen" style="display:none;">
     <h1>Real-Time Analysis</h1>
     <p>Analyzing engagement and sentiment in real-time...</p>
-
-    <!-- Sentiment Progress Bar -->
     <div class="progress-bar">
-      <div class="progress" id="sentiment-progress" style="width: 50%;">Analyzing... 50%</div>
+      <div class="progress" id="sentiment-progress">Analyzing... 0%</div>
     </div>
-
-    <div class="graph-container" id="graph-container">
-      <!-- Placeholder for dynamic graph visualization -->
-      <p>Real-time data visualization will appear here.</p>
-    </div>
-
-    <div class="real-time-scores" id="real-time-scores">
-      Engagement Score: 7.5 | Sentiment Score: 6.0
-    </div>
-
+    <div id="real-time-scores">Engagement Score: 0 | Sentiment Score: 0</div>
     <button class="button" id="pause-btn">Pause</button>
     <button class="button" id="highlight-btn">Highlight Sections</button>
   </div>
@@ -231,96 +176,43 @@
   <!-- Results Screen -->
   <div class="container" id="results-screen" style="display:none;">
     <h1>Analysis Results</h1>
-
-    <div class="key-insights">
-      <p><strong>Overall Engagement Score:</strong> 8.5/10</p>
-      <p><strong>Peak Engagement Times:</strong> Segment 1, Segment 3</p>
-      <p><strong>Improvement Tips:</strong> Increase pitch variation during quieter moments</p>
-    </div>
-
-    <div class="graph-container">
-      <p>Sentiment Analysis Chart (Visualization Placeholder)</p>
-    </div>
-
-    <button class="button">Download Report (PDF/CSV)</button>
+    <p><strong>Overall Engagement Score:</strong> 8.5/10</p>
+    <button class="button">Download Report</button>
     <button class="button">Replay Analysis</button>
   </div>
 
   <script>
-    // Real-time Analysis Simulation
-    let progress = document.getElementById("upload-progress");
-    let sentimentProgress = document.getElementById("sentiment-progress");
-    let realTimeScores = document.getElementById("real-time-scores");
+    // Navigation and file upload handling
+    document.getElementById("start-analysis-btn").addEventListener("click", function() {
+      document.getElementById("start-screen").style.display = "none";
+      document.getElementById("upload-file-screen").style.display = "block";
+    });
 
-    // Example of file upload process simulation
-    let uploadProgress = 0;
-    setInterval(() => {
-      if (uploadProgress < 100) {
-        uploadProgress += 2;
-        progress.style.width = uploadProgress + "%";
-        if (uploadProgress === 100) {
-          document.getElementById("next-btn").disabled = false;
-          document.getElementById("next-btn").style.opacity = 1;
-        }
-      }
-    }, 200);
-
-    // Real-time sentiment progress
-    let sentimentProgressValue = 50;
-    setInterval(() => {
-      if (sentimentProgressValue < 100) {
-        sentimentProgressValue += 2;
-        sentimentProgress.style.width = sentimentProgressValue + "%";
-        sentimentProgress.innerText = `Analyzing... ${sentimentProgressValue}%`;
-        realTimeScores.innerText = `Engagement Score: ${(7.5 + Math.random() * 0.5).toFixed(1)} | Sentiment Score: ${(6.0 + Math.random() * 0.5).toFixed(1)}`;
-      }
-    }, 1000);
-
-    // File Upload Handling
     document.getElementById("file-upload").addEventListener("change", function(event) {
-      if (event.target.files.length > 0) {
-        document.getElementById("next-btn").disabled = false;
-        document.get
       if (event.target.files.length > 0) {
         document.getElementById("next-btn").disabled = false;
         document.getElementById("next-btn").style.opacity = 1;
       }
     });
 
-    // Screen Navigation Logic
-    document.querySelector(".start-button").addEventListener("click", () => {
-      document.getElementById("start-screen").style.display = "none";
-      document.getElementById("upload-file-screen").style.display = "block";
-    });
-
-    document.getElementById("next-btn").addEventListener("click", () => {
+    document.getElementById("next-btn").addEventListener("click", function() {
       document.getElementById("upload-file-screen").style.display = "none";
       document.getElementById("analysis-screen").style.display = "block";
     });
 
-    // Dummy Real-Time Analysis Logic
+    // Simulating analysis progress
     let analysisProgress = 0;
-    const analysisInterval = setInterval(() => {
+    const progressInterval = setInterval(() => {
       if (analysisProgress < 100) {
-        analysisProgress += 1;
+        analysisProgress++;
         document.getElementById("sentiment-progress").style.width = analysisProgress + "%";
         document.getElementById("sentiment-progress").innerText = `Analyzing... ${analysisProgress}%`;
-        document.getElementById("real-time-scores").innerText = `Engagement Score: ${(7.5 + Math.random() * 0.5).toFixed(1)} | Sentiment Score: ${(6.0 + Math.random() * 0.5).toFixed(1)}`;
       } else {
-        clearInterval(analysisInterval);
+        clearInterval(progressInterval);
         document.getElementById("analysis-screen").style.display = "none";
         document.getElementById("results-screen").style.display = "block";
       }
     }, 100);
-
-    // Pause and Highlight Buttons (Dummy functionality)
-    document.getElementById("pause-btn").addEventListener("click", () => {
-      alert("Paused analysis (dummy functionality).");
-    });
-
-    document.getElementById("highlight-btn").addEventListener("click", () => {
-      alert("Highlighting sections (dummy functionality).");
-    });
   </script>
 </body>
 </html>
