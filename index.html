@@ -1,256 +1,233 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>InsightWave - Engagement Analysis</title>
-  <style>
-    /* General Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: Arial, sans-serif;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RhythmSense EngageSense</title>
+    <style>
+        body {
+            font-family: "Roboto", Arial, sans-serif;
+            background-color: #1e1e2f;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
 
-    body {
-      background-color: #121212;
-      color: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      min-height: 100vh;
-      text-align: center;
-      overflow: hidden;
-    }
+        header {
+            background: linear-gradient(90deg, #ff8c42, #ff3e3e);
+            padding: 20px;
+            text-align: center;
+            font-size: 2em;
+            color: #fff;
+        }
 
-    /* Main Container */
-    .container {
-      width: 90%;
-      max-width: 600px;
-      padding: 20px;
-      background-color: #1e1e1e;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-      margin-top: 20px;
-      transition: transform 0.5s ease;
-      display: none;
-    }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #2e2e3e;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
 
-    .active {
-      display: block;
-    }
+        h2 {
+            text-align: center;
+            font-size: 1.8em;
+            color: #ff8c42;
+            margin-bottom: 10px;
+        }
 
-    h1 {
-      font-size: 2em;
-      color: #fff;
-      margin-bottom: 15px;
-    }
+        p {
+            text-align: center;
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
 
-    p {
-      color: #a682ff;
-      font-size: 1.2em;
-      margin-bottom: 20px;
-    }
+        .button {
+            display: inline-block;
+            background-color: #ff8c42;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            font-size: 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin: 10px auto;
+            text-align: center;
+        }
 
-    /* Start Button */
-    .start-button, .button {
-      background-color: #a682ff;
-      color: white;
-      padding: 15px 30px;
-      font-size: 1.1em;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: transform 0.3s ease, background-color 0.3s ease;
-      margin-top: 20px;
-    }
+        .button:hover {
+            background-color: #ff5722;
+        }
 
-    .start-button:hover, .button:hover {
-      background-color: #7f5fbb;
-      transform: scale(1.05);
-    }
+        .progress-container {
+            margin: 20px auto;
+            width: 100%;
+            height: 25px;
+            background: #383850;
+            border-radius: 12px;
+        }
 
-    /* Waveform Animation */
-    .waveform {
-      width: 100%;
-      height: 100px;
-      background: linear-gradient(90deg, rgba(166, 130, 255, 0.5), transparent);
-      animation: pulse 2s infinite;
-      border-radius: 5px;
-      margin-top: 20px;
-    }
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff8c42, #ff3e3e);
+            border-radius: 12px;
+            transition: width 0.5s ease-in-out;
+        }
 
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.7; }
-    }
+        canvas {
+            margin: 20px auto;
+            max-width: 100%;
+            height: auto;
+        }
 
-    /* Upload File Styling */
-    .file-upload-container {
-      border: 2px dashed #a682ff;
-      padding: 40px;
-      border-radius: 8px;
-      text-align: center;
-      color: #a682ff;
-      margin-bottom: 20px;
-    }
+        .tooltip {
+            position: absolute;
+            display: none;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 5px;
+            font-size: 0.9em;
+            z-index: 10;
+            pointer-events: none;
+        }
 
-    .file-upload-container.dragging {
-      border: 2px solid #7f5fbb;
-    }
+        #keyInsights ul {
+            padding: 10px;
+            margin: 0;
+        }
 
-    .info-icon {
-      font-size: 1.2em;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-
-    .tooltip {
-      display: none;
-      position: absolute;
-      background-color: #333;
-      color: #fff;
-      padding: 8px;
-      font-size: 0.9em;
-      border-radius: 5px;
-      text-align: left;
-      top: -40px;
-      right: 10px;
-      white-space: nowrap;
-    }
-
-    .info-icon:hover + .tooltip {
-      display: block;
-    }
-
-    /* Progress Bar */
-    .progress-bar {
-      width: 100%;
-      height: 15px;
-      background-color: #333;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-
-    .progress {
-      height: 100%;
-      background-color: #a682ff;
-      width: 0;
-    }
-
-    /* Graph Container */
-    .graph-container {
-      width: 100%;
-      height: 200px;
-      background-color: #2c2c2c;
-      border-radius: 8px;
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: #a682ff;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 768px) {
-      h1 { font-size: 1.8em; }
-      .start-button, .button { width: 100%; padding: 20px; font-size: 1.3em; }
-    }
-  </style>
+        #keyInsights li {
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- Start Screen -->
-  <div class="container active" id="start-screen">
-    <h1>Welcome to InsightWave</h1>
-    <p>Analyze your audio to uncover insights into engagement and sentiment</p>
-    <button class="start-button" onclick="showScreen('upload-file-screen')">
-      Start Analysis
-      <span class="info-icon">ℹ️</span>
-      <div class="tooltip">Get feedback on engagement, sentiment, and audience response to your audio.</div>
-    </button>
-    <div class="waveform"></div>
-  </div>
-
-  <!-- Upload File Screen -->
-  <div class="container" id="upload-file-screen">
-    <h1>Upload Audio File</h1>
-    <div class="file-upload-container" ondrop="handleDrop(event)" ondragover="event.preventDefault()">
-      <input type="file" id="file-upload" accept=".mp3,.mp4,.wav" onchange="enableNextButton()">
-      <label for="file-upload">Drag and drop your audio file here or click to browse</label>
+    <header>RhythmSense EngageSense</header>
+    <div class="container" id="screen1">
+        <h2>Welcome to RhythmSense EngageSense</h2>
+        <p>Analyze your audio content to uncover AI-driven engagement insights across physical, emotional, and mental levels.</p>
+        <button class="button" onclick="showScreen(2)">Start Analysis</button>
     </div>
-    <button class="button" id="next-btn" onclick="showScreen('analysis-screen')" disabled>Next</button>
-  </div>
 
-  <!-- Real-Time Analysis Screen -->
-  <div class="container" id="analysis-screen">
-    <h1>Real-Time Analysis</h1>
-    <p>Analyzing engagement and sentiment in real-time...</p>
-    <div class="progress-bar">
-      <div class="progress" id="analysis-progress"></div>
+    <!-- Screen 2: File Upload -->
+    <div class="container" id="screen2" style="display: none;">
+        <h2>Upload Your Audio</h2>
+        <input type="file" id="fileInput" accept=".mp3,.wav" style="margin: 10px auto; display: block;">
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <button class="button" onclick="showScreen(1)">Back</button>
+        <button class="button" id="nextButton" style="display: none;" onclick="startAnalysis()">Analyze Engagement</button>
     </div>
-    <div class="graph-container">
-      <p>Data visualization of engagement and sentiment</p>
+
+    <!-- Screen 3: Analysis in Progress -->
+    <div class="container" id="screen3" style="display: none;">
+        <h2>Analysis in Progress</h2>
+        <p>Analyzing volume, pitch, sentiment, and engagement metrics...</p>
+        <div class="progress-container">
+            <div class="progress-bar" id="analysisProgress"></div>
+        </div>
+        <button class="button" onclick="showScreen(2)">Back</button>
+        <button class="button" id="viewResultsButton" style="display: none;" onclick="showScreen(4)">View Results</button>
     </div>
-    <button class="button" onclick="showScreen('results-screen')">View Results</button>
-  </div>
 
-  <!-- Results Screen -->
-  <div class="container" id="results-screen">
-    <h1>Analysis Results</h1>
-    <div class="graph-container">
-      <p>Engagement and Sentiment Graph</p>
+    <!-- Screen 4: Results -->
+    <div class="container" id="screen4" style="display: none;">
+        <h2>Analysis Results</h2>
+        <p><strong>Overall Engagement Score:</strong> <span id="overallScore">-</span></p>
+        <div id="chartsContainer">
+            <canvas id="engagementChart"></canvas>
+            <canvas id="sentimentChart"></canvas>
+        </div>
+        <div id="keyInsights">
+            <h3>Key Insights</h3>
+            <ul>
+                <li>Peak Engagement Times: Segment 2, Segment 4</li>
+                <li>Suggestions: Optimize interaction during low-pitched periods</li>
+            </ul>
+        </div>
+        <button class="button" onclick="downloadReport()">Download Report</button>
+        <button class="button" onclick="showScreen(2)">Analyze Another File</button>
     </div>
-    <p><strong>Overall Engagement Score:</strong> 8.5/10</p>
-    <button class="button">Download Report</button>
-    <button class="button" onclick="showScreen('start-screen')">Analyze Another</button>
-  </div>
 
-  <script>
-    // Navigation between screens
-    function showScreen(screenId) {
-      document.querySelectorAll('.container').forEach(container => {
-        container.classList.remove('active');
-      });
-      document.getElementById(screenId).classList.add('active');
-    }
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let progress = 0;
 
-    // Enable "Next" button after file upload
-    function enableNextButton() {
-      document.getElementById('next-btn').disabled = false;
-    }
-
-    // Simulate Analysis Progress
-    let progressInterval;
-    function simulateProgress() {
-      let progress = document.getElementById("analysis-progress");
-      let width = 0;
-      clearInterval(progressInterval);
-      progressInterval = setInterval(() => {
-        if (width >= 100) {
-          clearInterval(progressInterval);
-        } else {
-          width++;
-          progress.style.width = width + "%";
+        function showScreen(screenNumber) {
+            document.querySelectorAll('.container').forEach(screen => {
+                screen.style.display = 'none';
+            });
+            document.getElementById(`screen${screenNumber}`).style.display = 'block';
         }
-      }, 50);
-    }
 
-    // Start Progress on Analysis Screen Load
-    document.getElementById('analysis-screen').addEventListener('transitionstart', simulateProgress);
+        document.getElementById('fileInput').addEventListener('change', () => {
+            const fileSelected = document.getElementById('fileInput').files.length > 0;
+            document.getElementById('nextButton').style.display = fileSelected ? 'block' : 'none';
+        });
 
-    // Drag and drop handler
-    function handleDrop(event) {
-      event.preventDefault();
-      const files = event.dataTransfer.files;
-      if (files.length > 0) {
-        document.getElementById('file-upload').files = files;
-        enableNextButton();
-      }
-    }
-  </script>
+        function startAnalysis() {
+            showScreen(3);
+
+            const interval = setInterval(() => {
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    document.getElementById('viewResultsButton').style.display = 'block';
+                    updateCharts();
+                } else {
+                    progress += 10;
+                    document.getElementById('analysisProgress').style.width = progress + '%';
+                }
+            }, 500);
+        }
+
+        function updateCharts() {
+            const engagementCtx = document.getElementById('engagementChart').getContext('2d');
+            const sentimentCtx = document.getElementById('sentimentChart').getContext('2d');
+
+            new Chart(engagementCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Segment 1', 'Segment 2', 'Segment 3', 'Segment 4'],
+                    datasets: [{
+                        label: 'Engagement Score',
+                        data: [75, 85, 65, 90],
+                        backgroundColor: ['#ff8c42', '#ff3e3e', '#4caf50', '#2196f3']
+                    }]
+                }
+            });
+
+            new Chart(sentimentCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Segment 1', 'Segment 2', 'Segment 3', 'Segment 4'],
+                    datasets: [{
+                        label: 'Sentiment Score',
+                        data: [0.6, 0.7, 0.5, 0.8],
+                        borderColor: '#4caf50',
+                        backgroundColor: 'rgba(76, 175, 80, 0.2)',
+                        fill: true
+                    }]
+                }
+            });
+        }
+
+        function downloadReport() {
+            const csvContent = "data:text/csv;charset=utf-8," +
+                "Segment,Engagement Score,Sentiment Score\n" +
+                [75, 85, 65, 90].map((score, index) => `${index + 1},${score},${[0.6, 0.7, 0.5, 0.8][index]}`).join("\n");
+
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csvContent));
+            link.setAttribute("download", "engagement_report.csv");
+            document.body.appendChild(link);
+            link.click();
+        }
+    </script>
 </body>
 </html>
