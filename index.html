@@ -3,60 +3,63 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EngageSense - Advanced Engagement Intelligence</title>
+  <title>EngageSense - Real-Time Engagement Intelligence</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.6.1/socket.io.min.js"></script>
   <style>
-    body { 
-      font-family: Arial, sans-serif; 
-      background-color: #f9f9f9; 
-      margin: 0; 
-      padding: 0; 
-      text-align: center; 
-      color: #333; 
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      text-align: center;
+      color: #333;
     }
-    header { 
-      background-color: #4CAF50; 
-      color: white; 
-      padding: 20px 0; 
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px 0;
       margin-bottom: 20px;
     }
     header h1 { margin: 0; font-size: 2.5em; }
-    .container { 
-      max-width: 1200px; 
-      margin: auto; 
-      padding: 20px; 
-      background: white; 
-      border-radius: 8px; 
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); 
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
-    .button-row { 
-      display: flex; 
-      justify-content: center; 
-      gap: 20px; 
-      margin: 20px 0; 
+    .button-row {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
     }
-    button { 
-      padding: 12px 24px; 
-      font-size: 16px; 
-      border: none; 
-      border-radius: 5px; 
-      cursor: pointer; 
-      transition: background-color 0.3s ease; 
+    button {
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #4CAF50;
+      color: white;
+      transition: background-color 0.3s ease;
     }
-    button:hover { background-color: #ddd; }
-    canvas { 
-      margin: 20px auto; 
-      max-width: 800px; 
-      height: 400px; 
+    button:hover { background-color: #45a049; }
+    canvas {
+      margin: 20px auto;
+      max-width: 800px;
+      height: 400px;
     }
-    .insights { 
-      background-color: #f4f4f9; 
-      padding: 20px; 
-      border-radius: 10px; 
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
-      margin: 20px auto; 
-      max-width: 800px; 
-      text-align: left; 
+    .insights {
+      background-color: #f4f4f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin: 20px auto;
+      max-width: 800px;
+      text-align: left;
     }
     .insights p { margin: 10px 0; }
     footer {
@@ -71,7 +74,7 @@
 <body>
   <header>
     <h1>EngageSense: Real-Time Engagement Intelligence</h1>
-    <p>Track Physical, Spiritual, Mental, and Emotional Engagement.</p>
+    <p>Track Physical, Spiritual, Mental, and Emotional Engagement</p>
   </header>
 
   <div class="container">
@@ -101,8 +104,8 @@
 
   <script>
     let trackingInterval;
-    let time = 0;
     const dataStore = [];
+    let time = 0;
 
     // Initialize Charts
     const chartConfig = (label, color) => ({
@@ -136,50 +139,43 @@
     const mentalChart = new Chart(document.getElementById('mentalChart').getContext('2d'), chartConfig('Mental Engagement', '#FFC107'));
     const emotionalChart = new Chart(document.getElementById('emotionalChart').getContext('2d'), chartConfig('Emotional Engagement', '#F44336'));
 
+    // WebSocket Setup
+    const socket = io.connect('http://127.0.0.1:5000'); // Update with backend WebSocket URL
+
+    socket.on('connect', () => {
+      console.log('Connected to live data server.');
+    });
+
+    socket.on('live_update', (data) => {
+      const { physical, spiritual, mental, emotional } = data;
+
+      // Update Charts
+      updateChart(physicalChart, physical);
+      updateChart(spiritualChart, spiritual);
+      updateChart(mentalChart, mental);
+      updateChart(emotionalChart, emotional);
+
+      // Store data
+      dataStore.push({ time, physical, spiritual, mental, emotional });
+      time++;
+
+      // Update Insights
+      const avgEngagement = ((physical + spiritual + mental + emotional) / 4).toFixed(2);
+      document.getElementById('insights').innerHTML = `
+        <h2>Engagement Insights</h2>
+        <p><strong>Average Engagement:</strong> ${avgEngagement}%</p>
+        <p><strong>Highest Engagement Dimension:</strong> ${getHighestEngagement(data)}</p>
+      `;
+    });
+
     // Start Tracking
     document.getElementById('startTracking').addEventListener('click', () => {
-      const insightsDiv = document.getElementById('insights');
-      insightsDiv.innerHTML = '<h2>Engagement Insights</h2><p>Tracking engagement in real time...</p>';
-      
-      trackingInterval = setInterval(() => {
-        const physical = Math.random() * 100;
-        const spiritual = Math.random() * 100;
-        const mental = Math.random() * 100;
-        const emotional = Math.random() * 100;
-
-        // Update Charts
-        const updateChart = (chart, value) => {
-          chart.data.labels.push(time);
-          chart.data.datasets[0].data.push(value);
-          if (chart.data.labels.length > 20) {
-            chart.data.labels.shift();
-            chart.data.datasets[0].data.shift();
-          }
-          chart.update();
-        };
-
-        updateChart(physicalChart, physical);
-        updateChart(spiritualChart, spiritual);
-        updateChart(mentalChart, mental);
-        updateChart(emotionalChart, emotional);
-
-        // Store data
-        dataStore.push({ time, physical, spiritual, mental, emotional });
-        time++;
-
-        // Update Insights
-        const avgEngagement = ((physical + spiritual + mental + emotional) / 4).toFixed(2);
-        insightsDiv.innerHTML = `
-          <h2>Engagement Insights</h2>
-          <p><strong>Average Engagement:</strong> ${avgEngagement}%</p>
-          <p><strong>Highest Engagement Dimension:</strong> ${getHighestEngagement(physical, spiritual, mental, emotional)}</p>
-        `;
-      }, 1000);
+      socket.emit('start_tracking'); // Notify backend to start streaming data
     });
 
     // Stop Tracking
     document.getElementById('stopTracking').addEventListener('click', () => {
-      clearInterval(trackingInterval);
+      socket.emit('stop_tracking'); // Notify backend to stop streaming data
       alert('Tracking stopped.');
     });
 
@@ -199,11 +195,26 @@
       document.body.removeChild(link);
     });
 
-    // Helper Function: Get Highest Engagement Dimension
-    const getHighestEngagement = (physical, spiritual, mental, emotional) => {
-      const dimensions = { Physical: physical, Spiritual: spiritual, Mental: mental, Emotional: emotional };
+    // Helper Functions
+    function updateChart(chart, value) {
+      chart.data.labels.push(time);
+      chart.data.datasets[0].data.push(value);
+      if (chart.data.labels.length > 20) {
+        chart.data.labels.shift();
+        chart.data.datasets[0].data.shift();
+      }
+      chart.update();
+    }
+
+    function getHighestEngagement(data) {
+      const dimensions = {
+        Physical: data.physical,
+        Spiritual: data.spiritual,
+        Mental: data.mental,
+        Emotional: data.emotional
+      };
       return Object.keys(dimensions).reduce((a, b) => dimensions[a] > dimensions[b] ? a : b);
-    };
+    }
   </script>
 </body>
 </html>
