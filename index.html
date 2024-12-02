@@ -1,266 +1,258 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EngageSense - Comprehensive Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    :root {
-      --black: #121212;
-      --dark-grey: #1E1E1E;
-      --purple: #6E55BB;
-      --blue: #26A6FF;
-      --green: #1DB954;
-      --red: #E63946;
-      --white: #FFFFFF;
-      --grey: #9E9E9E;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngageSense</title>
+    <style>
+        /* General Styles */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
 
-    body {
-      font-family: 'Poppins', sans-serif;
-      margin: 0;
-      background-color: var(--black);
-      color: var(--white);
-      overflow-x: hidden;
-    }
+        .container {
+            width: 90%;
+            max-width: 600px;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
 
-    header {
-      background-color: var(--dark-grey);
-      text-align: center;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+        button {
+            padding: 10px 20px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            background-color: #3b82f6;
+            color: #ffffff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
 
-    header h1 {
-      margin: 0;
-      font-size: 2.5em;
-    }
+        button:hover {
+            background-color: #2563eb;
+        }
 
-    header p {
-      color: var(--grey);
-    }
+        .hidden {
+            display: none;
+        }
 
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-    }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #444;
+            border-radius: 5px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
 
-    .controls, .call-to-action {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin: 20px 0;
-    }
+        .progress-bar-inner {
+            height: 100%;
+            width: 0;
+            background: #3b82f6;
+            transition: width 0.5s ease;
+        }
 
-    button {
-      background-color: var(--purple);
-      border: none;
-      color: var(--white);
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background-color 0.3s;
-    }
+        canvas {
+            margin: 20px auto;
+            display: block;
+        }
 
-    button:hover {
-      background-color: #5a44a1;
-    }
+        /* Card Grid Styles */
+        .card-grid {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
 
-    .dashboard {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-      margin: 20px 0;
-    }
+        .card {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 45%;
+            min-width: 250px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
 
-    .card {
-      background-color: var(--dark-grey);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
 
-    .card h3 {
-      margin: 0 0 10px;
-      font-size: 1.5em;
-    }
+        .card h2 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            color: #3b82f6;
+        }
 
-    .progress-bar {
-      width: 100%;
-      background: var(--grey);
-      border-radius: 12px;
-      height: 10px;
-      margin: 10px 0;
-      position: relative;
-    }
+        .card p {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 15px;
+        }
 
-    .progress-bar span {
-      height: 10px;
-      border-radius: 12px;
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-    }
+        .card button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #3b82f6;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
 
-    .progress-bar span.physical { width: 80%; background: var(--blue); }
-    .progress-bar span.mental { width: 75%; background: var(--purple); }
-    .progress-bar span.spiritual { width: 90%; background: var(--green); }
+        .card button:hover {
+            background-color: #2563eb;
+        }
 
-    canvas {
-      width: 100%;
-      height: auto;
-    }
-
-    .sentiment span { font-weight: bold; color: var(--green); }
-
-    .upload-section {
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    .drag-drop-box {
-      border: 2px dashed var(--purple);
-      border-radius: 12px;
-      padding: 30px;
-      margin: 20px 0;
-      background-color: var(--dark-grey);
-      cursor: pointer;
-    }
-
-    .file-info {
-      margin-top: 10px;
-      font-size: 0.9em;
-      color: var(--grey);
-    }
-
-    .tooltip {
-      background-color: var(--grey);
-      color: var(--black);
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 0.9em;
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
-    }
-  </style>
+        #back-to-welcome {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 1rem;
+        }
+    </style>
 </head>
 <body>
-  <!-- Header -->
-  <header>
-    <h1>EngageSense</h1>
-    <p>Comprehensive Engagement Analysis Platform</p>
-  </header>
+    <main id="main-content">
+        <section id="welcome-screen" class="container">
+            <h1>Welcome to EngageSense</h1>
+            <p>Analyze audio engagement with cutting-edge technology.</p>
+            <button id="start-button">Get Started</button>
+        </section>
 
-  <!-- Call-to-Action -->
-  <div class="call-to-action">
-    <button id="getStarted">Get Started</button>
-  </div>
+        <section id="upload-record-screen" class="container hidden">
+            <h1>Upload or Record Audio</h1>
+            <div class="card-grid">
+                <div class="card" id="upload-card">
+                    <h2>Upload</h2>
+                    <p>Select an audio file to analyze.</p>
+                    <button id="upload-button">Upload Track</button>
+                    <button id="analyze-upload">Analyze Upload</button>
+                </div>
+                <div class="card" id="record-card">
+                    <h2>Record</h2>
+                    <p>Record live audio for analysis.</p>
+                    <button id="record-button">Start Recording</button>
+                    <button id="stop-recording" class="hidden">Stop Recording</button>
+                    <button id="analyze-recording" class="hidden">Analyze Recording</button>
+                </div>
+            </div>
+            <button id="back-to-welcome">Back</button>
+        </section>
 
-  <!-- Upload Section -->
-  <div class="container">
-    <div class="upload-section">
-      <h2>Upload or Record Audio</h2>
-      <div class="drag-drop-box" id="dragDropArea">
-        <p>Drag and drop your audio file here or click to select</p>
-        <p class="file-info" id="fileInfo"></p>
-      </div>
-      <button id="recordAudio">Record Audio</button>
-      <p id="recordingStatus"></p>
-    </div>
-  </div>
+        <section id="analysis-screen" class="container hidden">
+            <h1>Analyzing...</h1>
+            <p>Please wait while we process your audio data.</p>
+            <div class="progress-bar">
+                <div id="progress-bar-inner-analysis" class="progress-bar-inner"></div>
+            </div>
+        </section>
 
-  <!-- Dashboard -->
-  <div class="container">
-    <div class="dashboard">
-      <!-- Overall Engagement -->
-      <div class="card">
-        <h3>Overall Engagement</h3>
-        <p class="percentage">85%</p>
-        <p>Data sourced from live analysis</p>
-      </div>
+        <section id="results-screen" class="container hidden">
+            <h1>Results Summary</h1>
+            <ul id="engagement-results">
+                <li>Physical Engagement: <strong>85%</strong></li>
+                <li>Emotional Engagement: <strong>78%</strong></li>
+                <li>Mental Engagement: <strong>92%</strong></li>
+                <li>Spiritual Engagement: <strong>67%</strong></li>
+            </ul>
+            <canvas id="results-chart" width="400" height="300"></canvas>
+            <button id="start-over">Start Over</button>
+        </section>
+    </main>
 
-      <!-- Sentiment Analysis -->
-      <div class="card">
-        <h3>Sentiment Analysis</h3>
-        <p>Emotional Intensity: High</p>
-        <div class="sentiment">
-          <span>Positive</span>
-        </div>
-      </div>
+    <script>
+        // DOM Elements
+        const screens = {
+            welcome: document.getElementById('welcome-screen'),
+            upload: document.getElementById('upload-record-screen'),
+            analysis: document.getElementById('analysis-screen'),
+            results: document.getElementById('results-screen'),
+        };
 
-      <!-- Engagement Breakdown -->
-      <div class="card">
-        <h3>Engagement Breakdown</h3>
-        <p>Physical Engagement</p>
-        <div class="progress-bar"><span class="physical"></span></div>
-        <p>Mental Engagement</p>
-        <div class="progress-bar"><span class="mental"></span></div>
-        <p>Spiritual Engagement</p>
-        <div class="progress-bar"><span class="spiritual"></span></div>
-      </div>
+        const buttons = {
+            start: document.getElementById('start-button'),
+            back: document.getElementById('back-to-welcome'),
+            analyzeUpload: document.getElementById('analyze-upload'),
+            analyzeRecording: document.getElementById('analyze-recording'),
+            startOver: document.getElementById('start-over'),
+        };
 
-      <!-- Engagement Trends -->
-      <div class="card">
-        <h3>Engagement Trends</h3>
-        <canvas id="engagementChart"></canvas>
-      </div>
-    </div>
-  </div>
+        const progressBars = {
+            analysis: document.getElementById('progress-bar-inner-analysis'),
+        };
 
-  <script>
-    // Chart.js setup for engagement trends
-    const ctx = document.getElementById('engagementChart').getContext('2d');
-    const engagementChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: [],
-        datasets: [
-          { label: 'Physical', data: [], borderColor: 'blue', fill: false },
-          { label: 'Mental', data: [], borderColor: 'purple', fill: false },
-          { label: 'Spiritual', data: [], borderColor: 'green', fill: false },
-        ]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          title: { display: true, text: 'Engagement Trends' }
-        },
-        scales: {
-          x: { beginAtZero: true },
-          y: { beginAtZero: true }
+        // Navigation Functions
+        function navigateTo(screen) {
+            Object.values(screens).forEach(el => el.classList.add('hidden'));
+            screens[screen].classList.remove('hidden');
         }
-      }
-    });
 
-    // Drag-and-drop functionality
-    const dragDropArea = document.getElementById('dragDropArea');
-    const fileInfo = document.getElementById('fileInfo');
+        buttons.start.addEventListener('click', () => navigateTo('upload'));
+        buttons.back.addEventListener('click', () => navigateTo('welcome'));
+        buttons.startOver.addEventListener('click', () => navigateTo('welcome'));
 
-    dragDropArea.addEventListener('click', () => {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = '.mp3, .wav, .flac, .csv';
-      fileInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-          fileInfo.textContent = `Uploaded: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        // Analysis Simulation
+        function startAnalysis() {
+            navigateTo('analysis');
+            let progress = 0;
+
+            const interval = setInterval(() => {
+                progress += 10;
+                progressBars.analysis.style.width = `${progress}%`;
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    navigateTo('results');
+                    renderChart();
+                }
+            }, 500);
         }
-      });
-      fileInput.click();
-    });
 
-    // Record Audio Button Functionality
-    document.getElementById('recordAudio').addEventListener('click', () => {
-      alert('Audio recording functionality coming soon!');
-    });
-  </script>
+        buttons.analyzeUpload.addEventListener('click', startAnalysis);
+        buttons.analyzeRecording.addEventListener('click', startAnalysis);
+
+        // Chart Rendering
+        function renderChart() {
+            const canvas = document.getElementById('results-chart');
+            const ctx = canvas.getContext('2d');
+            const data = [85, 78, 92, 67];
+            const labels = ['Physical', 'Emotional', 'Mental', 'Spiritual'];
+            const barWidth = 80;
+            const gap = 20;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            data.forEach((value, index) => {
+                const x = index * (barWidth + gap) + gap;
+                const y = canvas.height - (value / 100) * canvas.height;
+
+                ctx.fillStyle = ['#f87171', '#60a5fa', '#a78bfa', '#facc15'][index];
+                ctx.fillRect(x, y, barWidth, canvas.height - y);
+
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.fillText(labels[index], x + barWidth / 2, canvas.height - 10);
+                ctx.fillText(`${value}%`, x + barWidth / 2, y - 10);
+            });
+        }
+    </script>
 </body>
 </html>
